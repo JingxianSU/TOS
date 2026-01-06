@@ -3,8 +3,7 @@ import { defineConfig } from "vitepress";
 // refer https://vitepress.dev/reference/site-config for details
 export default defineConfig({
   lang: "en-US",
-  title: "VitePress",
-  description: "Vite & Vue powered static site generator.",
+  title: "True Orchestration AI",
 
   themeConfig: {
     // nav: [
@@ -26,82 +25,11 @@ export default defineConfig({
         // text: 'Guide',
         items: [
           {
-            text: "Definition",
-            collapsed: false,
-            items: [
-              { text: "Framework Overview", link: "/definition/overview" },
-              {
-                text: "Orchestration Fabric",
-                collapsed: false,
-                items: [
-                  {
-                    text: "Criterion 0 — Control-Plane (Orchestration Capability)",
-                    link: "/definition/c0",
-                  },
-                ],
-              },
-              {
-                text: "I. Governance & Oversight",
-                collapsed: false,
-                items: [
-                  {
-                    text: "Criterion 1 — Human Governance",
-                    link: "/definition/c1",
-                  },
-                  {
-                    text: "Criterion 2 — Policy-Enforced Operation",
-                    link: "/definition/c2",
-                  },
-                  {
-                    text: "Criterion 3 — Interoperable Modularity",
-                    link: "/definition/c3",
-                  },
-                ],
-              },
-              {
-                text: "II. Knowledge, Reasoning & Collaboration",
-                collapsed: false,
-                items: [
-                  {
-                    text: "Criterion 4 — Semantic Communication Integrity",
-                    link: "/definition/c4",
-                  },
-                  {
-                    text: "Criterion 5 — Symbolic-Subsymbolic Integration",
-                    link: "/definition/c5",
-                  },
-                  {
-                    text: "Criterion 6 — Epistemic Prudence",
-                    link: "/definition/c6",
-                  },
-                  {
-                    text: "Criterion 7 — Incremental Knowledge Evolution",
-                    link: "/definition/c7",
-                  },
-                ],
-              },
-              {
-                text: "III. Provenance, Transparency & Risk",
-                collapsed: false,
-                items: [
-                  {
-                    text: "Criterion 8 — Transparency & Explainability",
-                    link: "/definition/c8",
-                  },
-                  {
-                    text: "Criterion 9 — Immutable Provenance",
-                    link: "/definition/c9",
-                  },
-                  {
-                    text: "Criterion 10 — Lifecycle Accountability",
-                    link: "/definition/c10",
-                  },
-                ],
-              },
-            ],
+            text:"True Orchestration AI System Definition",
+            link: "/definition",
           },
           {
-            text: "Definition",
+            text: "Criterion Definition",
             collapsed: false,
             items: [
               { text: "Framework Overview", link: "/definition/overview" },

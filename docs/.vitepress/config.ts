@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 // refer https://vitepress.dev/reference/site-config for details
 export default defineConfig({
   lang: "en-US",
-  title: "True Orchestration AI",
+  title: "Trust Worthy Orchestration",
 
   themeConfig: {
     // nav: [
@@ -25,7 +25,7 @@ export default defineConfig({
         // text: 'Guide',
         items: [
           {
-            text:"True Orchestration AI System Definition",
+            text:"Trust Worthy True Orchestration of AIs and Systems",
             link: "/definition",
           },
           {

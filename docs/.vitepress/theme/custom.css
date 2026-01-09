@@ -1,7 +1,24 @@
-/* 
+/* 让 hero 整体不再受布局最大宽度影响 */
 .VPHomeHero .container {
-    max-width: 100%;
-  }
-  .VPHomeHero .main {
-    max-width: 100%;
-  } */
+  max-width: none !important;
+  width: 70% !important;
+}
+
+/* 关键：让 main 这一列占满整行 */
+.VPHomeHero .container .main {
+  max-width: none !important;
+  width: 100% !important;
+  flex: 0 0 100% !important;
+}
+
+/* 关键：解除文本自身的 max-width 限制 */
+.VPHomeHero .container .main .text,
+.VPHomeHero .container .main .tagline {
+  max-width: none !important;
+}
+
+/* 如果右侧 image/占位仍在，强制去掉（有些主题即使没配 image 也会留空位） */
+.VPHomeHero .container .image {
+  display: none !important;
+}
+

@@ -156,71 +156,175 @@ Where:
 - error MUST exist
     
 - result MUST NOT appear
-## **6. Common Error Object**
+## **6. Common Status / Error Object**
 
   
 
-The error block inside an error envelope has a fixed, category-agnostic shape:
-```
-{
-  "code": "string",
-  "message": "string",
-  "details"?: object
-}
+The status/error code system is **unified** across success and failure outcomes.
 
-```
-Purpose:
-
-- allows all categories to report failure consistently
+- On **success**, the 7-digit code SHOULD appear in result.status.code.
     
-- avoids category-specific interpretation at the base protocol layer
+- On **failure**, the 7-digit code MUST appear in error.code.
+    
 
-### **6.1 Error Code Registry**
+  
 
-The `error.code` field MUST reference a canonical, protocol-wide registry.
+### **6.1 7-Digit Semantic Code Specification**
 
-Error codes follow HTTP-semantic conventions, even when used internally.
+  
 
-#### Primary Review Error Codes (User Message Level)
+**Digit positions (7 digits):**
+|**Position**|**Meaning**|**Notes**|
+|---|---|---|
+|1|Status|1 = success, 2 = failure|
+|2|Reviewer|1 = Human, 2 = AI/Machine|
+|3|Message Status|1 = unchanged, 2 = modified, 3 = added|
+|4|Has Explanation|1 = no, 2 = yes|
+|5|Content Mix|interpretation/explanation combination|
+|6|Explanation Source|where explanations come from|
+|7|Reserved|fixed as 0|
 
-| Code | Label | Description |
-|----|----|----|
-| 2001 | Insufficient Permission | User lacks authorization |
-| 2002 | Unclear Question | User intent cannot be confidently determined |
-| 2003 | Contains Sensitive Info | Sensitive or restricted information detected |
-| 2004 | Policy Violation | Explicit policy violation |
-| 2005 | Too Many Requests | Rate or quota limit exceeded |
+#### **6.1.1 Digit Definitions**
 
-#### Secondary Review Error Codes (AI Response Level)
+**Digit 1 — Status**
+|**Value**|**Meaning**|
+|---|---|
+|1|Success|
+|2|Failure|
 
-| Code | Label | Description |
-|----|----|----|
-| 3001 | Poor Quality Response | Output quality unacceptable |
-| 3002 | Inappropriate Content | Unsafe or inappropriate AI output |
-| 3003 | Incomplete Answer | Output fails to address request |
-| 3004 | Context Conflict | Conflicts with prior context or facts |
-| 2005 | Format Mismatch | Output violates required format |
+**Digit 2 — Reviewer**
+|**Value**|**Meaning**|
+|---|---|
+|1|Human|
+|2|AI/Machine|
+
+**Digit 3 — Message Status**
+|**Value**|**Meaning**|
+|---|---|
+|1|Original message unchanged|
+|2|Message modified|
+|3|Information added|
+
+**Digit 4 — Has Explanation**
+|**Value**|**Meaning**|
+|---|---|
+|1|No explanation|
+|2|Has explanation|
+
+**Digit 5 — Content Mix (Interpretation / Explanation)**
+|**Value**|**Meaning**|
+|---|---|
+|1|No interpretation, no explanation|
+|2|Interpretation only|
+|3|Explanation only|
+|4|Interpretation + explanation|
 
 
-### **6.2 Review Stage Semantics**
+**Digit 6 — Explanation Source**
+|**Value**|**Meaning**|
+|---|---|
+|1|No explanation|
+|2|Internal reference|
+|3|External reference|
+|4|Internal + external reference|
+|5|Case internal|
+|6|Case external|
+|7|Case internal + case external|
 
-Error codes are interpreted within a review stage context.
+**Digit 7 — Reserved**
+|**Value**|**Meaning**|
+|---|---|
+|0|Reserved (fixed)|
 
-Two review stages exist:
+### **6.2 Consistency Rules (MUST)**
 
-- **Primary review** — evaluates user-submitted messages
-- **Secondary review** — evaluates AI-generated responses
+  
+
+To avoid contradictory codes, implementations MUST enforce:
+
+1. **Length & format**
+    
+    - Code MUST be exactly **7 digits**
+        
+    - Code MUST be transmitted as a **string**, e.g. "2212320"
+        
+    
+2. **Reserved digit**
+    
+    - Digit 7 MUST be "0".
+        
+    
+3. **Explanation dependency**
+    
+    - If Digit 4 = 1 (no explanation):
+        
+        - Digit 5 MUST be 1 or 2 (no explanation allowed)
+            
+        - Digit 6 MUST be 1
+            
+        
+    - If Digit 4 = 2 (has explanation):
+        
+        - Digit 5 MUST be 3 or 4 (explanation must exist)
+            
+        - Digit 6 MUST be one of 2..7 (source must be meaningful)
+            
+        
+    
+4. **Explanation source dependency**
+    
+    - Digit 6 = 1 implies Digit 4 = 1 and Digit 5 ∈ {1,2}
+        
+    
+
+  
+
+### **6.3 Review Stage Semantics (OPTIONAL but RECOMMENDED)**
+
+  
+
+The legacy “primary/secondary review stage” concept can be expressed through metadata:
+
+- error.details.review_stage: "primary" | "secondary"
+    
+- _meta.labels.review_stage: optional UI or audit tag
+    
+
+  
 
 Rules:
 
-- Primary review errors MAY prevent model execution
-- Secondary review errors occur only after model execution
-- The same numeric code (e.g. 2003) MAY have different meanings across stages
+- Review stage hints are OPTIONAL but RECOMMENDED for auditability
+    
+- Review stage hints MUST NOT alter envelope semantics
+    
 
+  
 
-### **6.3 Error Envelope Example**
+### **6.4 Example: Error Envelope Using 7-Digit Code**
 
+  
 
+Example scenario: **AI/Machine** rejects a user message for sensitive content, with an explanation referencing internal policy.
+
+- Status = failure (2)
+    
+- Reviewer = machine (2)
+    
+- Message status = unchanged (1)
+    
+- Has explanation = yes (2)
+    
+- Content mix = explanation only (3)
+    
+- Explanation source = internal reference (2)
+    
+- Reserved = 0
+    
+
+  
+
+Code: "2212320"
 
 ```
 {
@@ -228,22 +332,21 @@ Rules:
   "id": "req-123",
   "envelope_type": "policy.evaluate",
   "error": {
-    "code": "2003",
+    "code": "2212320",
     "message": "Contains Sensitive Info",
     "details": {
-      "review_stage": "primary"
+      "review_stage": "primary",
+      "explanation": {
+        "summary": "Sensitive or restricted information detected.",
+        "references": [
+          { "type": "internal", "ref": "policy://sensitive-info/v1" }
+        ]
+      }
     }
   }
 }
+
 ```
-
-Rules:
-
-- `error.code` MUST match the registry
-    
-- `message` SHOULD match the canonical label
-    
-- `details.review_stage` is OPTIONAL but RECOMMENDED
 
 
 

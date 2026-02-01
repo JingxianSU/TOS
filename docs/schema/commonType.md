@@ -114,24 +114,33 @@ Where:
 - result MUST exist if the envelope is a success
     
 - _meta is optional
+### **4.1 Common Success Status Codes (7-Digit)**
 
-### **4.1 Common Success Status Codes**
+  
 
-Successful responses MAY include a semantic status indicator inside `result`
-to reflect approval outcomes.
+Successful responses MAY include a semantic status indicator inside result to reflect approval outcomes.
 
-Canonical success statuses:
+  
 
-| Code | Label             | Meaning                                 |
-| ---- | ----------------- | --------------------------------------- |
-| 1000  | APPROVED          | Approved without modification           |
-| 1001  | APPROVED (Edited) | Approved after system or reviewer edits |
-| 1002  | APPROVED (Added) | Approved after system or reviewer edits |
+Recommended structure:
 
+```
+{
+  "result": {
+    "status": {
+      "code": "string(7 digits)",
+      "label": "string"
+    },
+    "...": "..."
+  }
+}
+```
 Rules:
 
-- Success envelopes MUST use `result`, not `error`
-- `1001` indicates semantic modification, not resource creation
+- Success envelopes MUST use result, not error
+    
+- result.status.code MUST follow the **7-digit code spec** in Section 6.1
+    
 - Status labels are semantic hints and MUST NOT alter envelope structure
 
 ## **5. Common Error Response Format**
@@ -141,14 +150,15 @@ Rules:
 Error envelopes follow the same structural base:
 ```
 {
-  "jsonrpc": "2.0",
-  "id": string,
-  "envelope_type": string,
-  "error": {
-    "code": string,
-    "message": string
-  },
-  "_meta"?: object
+  "jsonrpc": "2.0",
+  "id": "string",
+  "envelope_type": "string",
+  "error": {
+    "code": "string(7 digits)",
+    "message": "string",
+    "details": {}
+  },
+  "_meta": {}
 }
 ```
 Where:
@@ -156,6 +166,8 @@ Where:
 - error MUST exist
     
 - result MUST NOT appear
+    
+- error.code MUST follow the **7-digit code spec** in Section 6.1
 ## **6. Common Status / Error Object**
 
   
